@@ -1,12 +1,16 @@
-# 数字图像处理HW3
-- 林汉宁  自动化52 2150504042
-- 提交日期：2019-03-18
-## 摘要
-本次作业使用python3.67面向对象方式编程，使用了opencv与numpy等库。
-## 技术讨论
-### 1. 直方图画出
-#### 源代码
-	def drawHist(self):
+#project3-linhanning-auto52-2150504042
+import cv2 as cv
+import numpy as np
+from histogram_matching import ExactHistogramMatcher
+#OOP create class Pic
+class Pic:
+    def __init__(self, name, path):
+         self.name=name
+         self.path=path
+         self.img=cv.imread(path)
+         self.target_img=self.img
+         print("[LOG]:Object {} created successfully!".format(self.name))
+    def drawHist(self):
         h = np.zeros((256,256,3))
         bins = np.arange(256).reshape(256,1)
         color = [ (255,0,0),(0,255,0),(0,0,255) ] #BGR三种颜色  
@@ -20,16 +24,9 @@
         # cv.imshow("Hist",h)
         cv.imwrite('Hist_of_{}.bmp'.format(self.name),h)
         print("[LOG]:Hist_of_{}.bmp created Successfully!".format(self.name))
-#### 思路与结果
-使用cv2.calcHist求出直方图，再使用cv2.polylines函数将直方图画出
-如下，选择几张直方图展示：
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/Hist_of_elain2.bmp)
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/Hist_of_elain.bmp)
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/Hist_of_elain3.bmp)
-
-### 2.  直方图均衡 
-#### 源代码
-	def equalizeH(self):
+        # cv.waitKey(0)
+        # cv.destroyAllWindows()
+    def equalizeH(self):
         gray = cv.cvtColor(self.img, cv.COLOR_BGR2GRAY)
         dst=cv.equalizeHist(gray)
         #test
@@ -38,20 +35,7 @@
         # cv.destroyAllWindows()
         cv.imwrite('2-equalized_of_{}.bmp'.format(self.name),dst)
         print("[LOG]:2-equalized_of_{}.bmp created successfully!".format(self.name))
-#### 代码思路
-首先使用opencv库函数quaequalizeHist可实现直方图均衡
-#### 结果
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/2-equalized_of_woman2.bmp)
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/2-equalized_of_woman1.bmp)
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/2-equalized_of_woman.bmp)
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/2-equalized_of_lena4.bmp)
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/2-equalized_of_lena2.bmp)
-
-
-
-### 3.计算lena图像的均值方差
-#### 源代码
-	def histogramMatching(self,reference_img):
+    def histogramMatching(self,reference_img):
         self.target_img = self.img
         # reference_img is the one to be learned
         reference_histogram = ExactHistogramMatcher.get_histogram(reference_img)
@@ -61,16 +45,13 @@
         self.target_img=new_target_img
         cv.imwrite('3-histogrammatching_of_{}.bmp'.format(self.name),self.target_img)
         print("[LOG]:3-histogrammatching_of_{}.bmp created sucessfully!".format(self.name))
-#### 代码思路
-在此感谢Stefano Di Martino 所编写的开源直方图匹配库函数，其原理是分别计算两幅图像的随机变量累积分布函数值，之后在之间建立映射关系，对于原图像的每一个值，对应另一函数中中索引为一像素值。通过这种方式可以将原图像处理为近似于模板的直方图分布的图像。
-#### 最终结果
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/3-histogrammatching_of_lena.bmp)
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/3-histogrammatching_of_elain.bmp)
-
-
-### 4.局部图像增强  
-#### 源代码
-	def LocalEnhancement(self):
+        # # misc.imsave('F:/grey_out.png', new_target_img)
+        # filename = 'F:/grey_out.png'
+        # with open(filename, 'wb') as f:
+        # writer = png.Writer(width=new_target_img.shape[1], height=new_target_img.shape[0], bitdepth=16, greyscale=True)
+        # zgray2list = new_target_img.tolist()
+        # writer.write(f, zgray2list)
+    def LocalEnhancement(self):
         E = 2
         para0 = 0.4
         para1 = 0.02
@@ -121,24 +102,112 @@
                 new_img[i][j] = self.img[i][j][0]
         cv.imwrite('4-Local_Enhancement_of_{}.bmp'.format(self.name),new_img)
         print("[LOG]:4-Local_Enhancement_of_{}.bmp created sucessfully!".format(self.name))
-#### 代码思路
-首先计算均值与方差，计算区域局部方差均值。找到较暗区域后增强区域
-#### 部分结果展示
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/4-Local_Enhancement_of_elain.bmp)
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/4-Local_Enhancement_of_lena.bmp)
+        
+            
 
-
-### 5、图像分割
-#### 源代码
-	def histogramSegementation(self):
+    def histogramSegementation(self):
         gray=cv.cvtColor(self.img,cv.COLOR_BGR2GRAY)
         ret2,th2 = cv.threshold(gray,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
         cv.imwrite('5-histogramSegmentation_of_{}.bmp'.format(self.name),th2)
         print("[LOG]:5-histogramSegmentation_of_{}.bmp created sucessfully!".format(self.name))
-#### 代码思路
-使用opencv threshold函数可实现双峰法直方图图像分割
-#### 结果展示
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/5-histogramSegmentation_of_woman.bmp)
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/5-histogramSegmentation_of_lena.bmp)
-![Alt text](https://github.com/HanningLin/hw3/blob/master/img/5-histogramSegmentation_of_elain.bmp)
+        
+#3-1
+print("-------------------------------------")
+print("#ANS:3-1 Show Histgram\n")
+elain=Pic("elain","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/elain.bmp")
+elain1=Pic("elain1","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/elain1.bmp")
+elain2=Pic("elain2","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/elain2.bmp")
+elain3=Pic("elain3","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/elain3.bmp")
+citywall=Pic("citywall","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/citywall.bmp")
+citywall1=Pic("citywall1","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/citywall1.bmp")
+citywall2=Pic("citywall2","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/citywall2.bmp")
+lena=Pic("lena","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/lena.bmp")
+lena1=Pic("lena1","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/lena1.bmp")
+lena2=Pic("lena2","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/lena2.bmp")
+lena4=Pic("lena4","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/lena4.bmp")
+woman=Pic("woman","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/woman.bmp")
+woman1=Pic("woman1","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/woman1.bmp")
+woman2=Pic("woman2","/home/hanninglin/Documents/CV/PROJECT/hw3/3rd-pro/woman2.bmp")
+elain.drawHist()
+elain1.drawHist()
+elain2.drawHist()
+elain3.drawHist()
+citywall.drawHist()
+citywall1.drawHist()
+citywall2.drawHist()
+lena.drawHist()
+lena1.drawHist()
+lena2.drawHist()
+lena4.drawHist()
+woman.drawHist()
+woman1.drawHist()
+woman2.drawHist()
+3-2
+print("-------------------------------------")
+print("#ANS:3-2 equalized Based on Histgram\n")
+elain.equalizeH()
+elain1.equalizeH()
+elain2.equalizeH()
+elain3.equalizeH()
+citywall.equalizeH()
+citywall1.equalizeH()
+citywall2.equalizeH()
+lena.equalizeH()
+lena1.equalizeH()
+lena2.equalizeH()
+lena4.equalizeH()
+woman.equalizeH()
+woman1.equalizeH()
+woman2.equalizeH()
+print("-------------------------------------")
+print("#ANS:3-3 Histgram matching\n")
+elain.histogramMatching(lena2.img)
+lena.histogramMatching(lena1.img)
+print("-------------------------------------")
+print("#ANS:3-4 Local Enhancement\n")
+elain.LocalEnhancement()
+lena.LocalEnhancement()
+print("-------------------------------------")
+print("#ANS:3-5 Histogram Segementation\n")
+elain.histogramSegementation()
+woman.histogramSegementation()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# elain
+# elain1
+# elain2
+# elain3
+# citywall
+# citywall1
+# citywall2
+# lena
+# lena1
+# lena2
+# lena4
+# woman
+# woman1
+# woman2
